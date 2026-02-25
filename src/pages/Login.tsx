@@ -1,30 +1,16 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
+import { useTheme } from '../contexts/ThemeContext'
 
 function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const [theme] = useState<'light' | 'dark'>(
-    () => (localStorage.getItem('theme') as 'light' | 'dark') || 'light'
-  )
+  const { colors } = useTheme()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-
-  const colors = {
-    bg: theme === 'dark' ? '#1a1a1a' : '#efefef',
-    cardBg: theme === 'dark' ? '#2d2d2d' : '#efefef',
-    border: theme === 'dark' ? '#444' : '#ccc',
-    text: theme === 'dark' ? '#efefef' : '#000000',
-    inputBg: theme === 'dark' ? '#2d2d2d' : '#efefef',
-  }
-
-  useEffect(() => {
-    document.body.style.backgroundColor = colors.bg
-    document.body.style.color = colors.text
-  }, [colors.bg, colors.text])
 
   useEffect(() => {
     // Check if already logged in
@@ -77,7 +63,7 @@ function Login() {
             padding: '10px',
             border: '1px solid #dc3545',
             borderRadius: '4px',
-            backgroundColor: theme === 'dark' ? '#3d1a1a' : '#f8d7da',
+            backgroundColor: colors.bg === '#1a1a1a' ? '#3d1a1a' : '#f8d7da',
           }}
         >
           {error}

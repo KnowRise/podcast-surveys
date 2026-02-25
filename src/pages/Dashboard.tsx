@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
+import { useTheme } from '../contexts/ThemeContext'
+import ThemeToggle from '../components/ThemeToggle'
 
 interface Survey {
   id: string
@@ -27,9 +29,7 @@ function Dashboard() {
   const [formatStats, setFormatStats] = useState<Stats>({})
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage] = useState(10)
-  const [theme, setTheme] = useState<'light' | 'dark'>(
-    () => (localStorage.getItem('theme') as 'light' | 'dark') || 'light'
-  )
+  const { colors } = useTheme()
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -40,12 +40,6 @@ function Dashboard() {
   useEffect(() => {
     applyFilters()
   }, [surveys, topicFilter, formatFilter, searchTerm])
-
-  useEffect(() => {
-    localStorage.setItem('theme', theme)
-    document.body.style.backgroundColor = theme === 'dark' ? '#1a1a1a' : '#ffffff'
-    document.body.style.color = theme === 'dark' ? '#ffffff' : '#000000'
-  }, [theme])
 
   const checkAuth = async () => {
     const { data } = await supabase.auth.getSession()
@@ -113,10 +107,6 @@ function Dashboard() {
     setCurrentPage(1) // Reset to first page when filters change
   }
 
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'))
-  }
-
   const handleLogout = async () => {
     await supabase.auth.signOut()
     navigate('/login?admin')
@@ -135,37 +125,12 @@ function Dashboard() {
     setCurrentPage(Math.min(Math.max(1, page), totalPages))
   }
 
-  // Theme-based colors
-  const colors = {
-    bg: theme === 'dark' ? '#1a1a1a' : '#efefef',
-    cardBg: theme === 'dark' ? '#2d2d2d' : '#efefef',
-    border: theme === 'dark' ? '#444' : '#ccc',
-    text: theme === 'dark' ? '#efefef' : '#000000',
-    textSecondary: theme === 'dark' ? '#aaa' : '#666',
-    statsBg: theme === 'dark' ? '#2d2d2d' : '#f8f9fa',
-    filterBg: theme === 'dark' ? '#2d2d2d' : '#f8f9fa',
-  }
-
   return (
     <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto', color: colors.text }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
         <h1>Survey Dashboard</h1>
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-          <button
-            onClick={toggleTheme}
-            style={{
-              padding: '10px 20px',
-              backgroundColor: theme === 'dark' ? '#444' : '#f0f0f0',
-              color: colors.text,
-              border: `1px solid ${colors.border}`,
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '20px',
-            }}
-            title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-          >
-            {theme === 'light' ? '🌙' : '☀️'}
-          </button>
+        <div style={{ display: 'flex', gap: '20px', alignItems: 'center', justifyContent: 'center' }}>
+          <ThemeToggle />
           <button
             onClick={handleLogout}
             style={{
