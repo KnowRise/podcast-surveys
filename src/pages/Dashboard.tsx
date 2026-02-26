@@ -29,6 +29,7 @@ function Dashboard() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const navigate = useNavigate();
+  const [deleteItems, setDeleteItems] = useState<string[]>([]);
 
   useEffect(() => {
     checkAuth();
@@ -105,6 +106,19 @@ function Dashboard() {
 
     setFilteredSurveys(filtered);
     setCurrentPage(1); // Reset to first page when filters change
+  };
+
+  // Change handleDeleteSurvey to accept an array of IDs for bulk deletion
+  const handleDeleteSurvey = async (ids: string[]) => {
+    if (window.confirm("Are you sure you want to delete these surveys?")) {
+      const { error } = await supabase.from("surveys").delete().in("id", ids);
+      if (error) {
+        console.error("Error deleting surveys:", error);
+      } else {
+        setSurveys((prev) => prev.filter((s) => !ids.includes(s.id)));
+        setDeleteItems([]);
+      }
+    }
   };
 
   const handleLogout = async () => {
@@ -265,6 +279,16 @@ function Dashboard() {
                 </button>
               </div>
             </div>
+            {deleteItems.length > 0 && (
+              <div className="mt-2.5">
+                <button
+                  onClick={() => handleDeleteSurvey(deleteItems)}
+                  className="px-4 py-2 cursor-pointer bg-red-500 text-white border border-red-600 rounded hover:bg-red-600"
+                >
+                  Delete Selected ({deleteItems.length})
+                </button>
+              </div>
+            )}
 
             {/* Results */}
             <div>
@@ -283,9 +307,32 @@ function Dashboard() {
                     {currentSurveys.map((survey) => (
                       <div
                         key={survey.id}
-                        className="p-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-800"
+                        className="p-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-800 cursor-pointer"
+                        onClick={() => {
+                          if (deleteItems.includes(survey.id)) {
+                            setDeleteItems(
+                              deleteItems.filter((id) => id !== survey.id),
+                            );
+                          } else {
+                            setDeleteItems([...deleteItems, survey.id]);
+                          }
+                        }}
                       >
                         <div className="mb-2.5">
+                          <input
+                            type="checkbox"
+                            checked={deleteItems.includes(survey.id)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setDeleteItems([...deleteItems, survey.id]);
+                              } else {
+                                setDeleteItems(
+                                  deleteItems.filter((id) => id !== survey.id),
+                                );
+                              }
+                            }}
+                            className="mr-2"
+                          />
                           <strong className="text-lg text-gray-900 dark:text-gray-100">
                             {survey.name === "" ? "Anonymous" : survey.name}
                           </strong>
