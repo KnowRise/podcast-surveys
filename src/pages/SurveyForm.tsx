@@ -27,7 +27,7 @@ const TOPICS = [
   "Tech Trends & News",
   "Competitive Programming & Hackathons",
   "Linux & Open Source Culture",
-  "Other",
+  "Other (Isikan di kolom Deskripsi)",
 ];
 
 const PODCAST_FORMATS = [
@@ -150,7 +150,7 @@ function SurveyForm() {
 
           <div className="flex flex-col gap-4 border border-slate-300 dark:border-slate-600 rounded p-4">
             <label className="font-bold">
-              Topik yang ingin kamu dengarkan di podcast kami? *
+              Topik yang ingin kamu dengarkan di podcast kami? <span className="text-red-500">*</span>
             </label>
             <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-2.5">
               {TOPICS.map((topic) => (
@@ -169,7 +169,7 @@ function SurveyForm() {
 
           <div>
             <label htmlFor="description" className="block font-bold">
-              Description / Additional Comments
+              Deskripsi (Opsional)
             </label>
             <textarea
               id="description"
@@ -184,7 +184,8 @@ function SurveyForm() {
 
           <div className="flex flex-col gap-4 border border-slate-300 dark:border-slate-600 rounded p-4">
             <label className="block font-bold">
-              Preferred Podcast Format *
+              {/* Preferred Podcast Format * */}
+              Format Podcast yang kamu sukai? <span className="text-red-500">*</span>
             </label>
             <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-2.5">
               {PODCAST_FORMATS.map((format) => (
@@ -208,7 +209,8 @@ function SurveyForm() {
 
           <div>
             <label htmlFor="suggested_guest" className="block font-bold">
-              Suggested Guest
+              {/* Suggested Guest */}
+              Sara (Opsional)
             </label>
             <input
               id="suggested_guest"
